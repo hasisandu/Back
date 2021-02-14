@@ -1,6 +1,10 @@
 const express= require('express');
 const mongoose= require('mongoose');
 
+//--------------------------------
+const AdminUserRoute = require('./routes/AdminUserRoute');
+//--------------------------------
+
 const app = express();
 
 mongoose.connect(
@@ -17,4 +21,8 @@ mongoose.connect(
     })
 }).catch((error)=>{
     console.log(error);
-})
+});
+
+//------------------------------
+app.use('/api/v1/adminUserRoute', AdminUserRoute)
+//------------------------------

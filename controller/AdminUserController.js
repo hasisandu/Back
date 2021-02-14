@@ -32,5 +32,8 @@ const registerUser=(req,resp)=>{
         }
 
     });
-
 };
+
+module.exports = {
+    registerUser
+}

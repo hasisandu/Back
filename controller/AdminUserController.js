@@ -53,7 +53,9 @@ const loginUser = (req, resp) => {
 
               bcrypt.compare(password, result.password, function (err, finalResult){
                   if (finalResult){
-                      console.log('ok');
+                      resp.status(200).json({message:'success', token:token});
+                  }else{
+                      resp.status(200).json({message:'Failed!'});
                   }
               });
 

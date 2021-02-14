@@ -38,39 +38,73 @@ const registerUser = (req, resp) => {
 };
 
 const loginUser = (req, resp) => {
-  const email = req.headers.email;
-  const password= req.headers.password;
+    const email = req.headers.email;
+    const password = req.headers.password;
 
-  if (password!=null){
+    if (password != null) {
 
-      const token = jwt.sign(
-          {email:email,password:password},
-          process.env.JWT_ACCOUNT,{expiresIn: '2h'}
-      );
+        const token = jwt.sign(
+            {email: email, password: password},
+            process.env.JWT_ACCOUNT, {expiresIn: '2h'}
+        );
 
-      AdminUserSchema.findOne({email:email}, (error,result)=>{
-          if (result!=null){
+        AdminUserSchema.findOne({email: email}, (error, result) => {
+            if (result != null) {
 
-              bcrypt.compare(password, result.password, function (err, finalResult){
-                  if (finalResult){
-                      resp.status(200).json({message:'success', token:token});
-                  }else{
-                      resp.status(200).json({message:'Failed!'});
-                  }
-              });
+                bcrypt.compare(password, result.password, function (err, finalResult) {
+                    if (finalResult) {
+                        resp.status(200).json({message: 'success', token: token});
+                    } else {
+                        resp.status(200).json({message: 'Failed!'});
+                    }
+                });
 
-          }else{
-              resp.status(200).json({message:'Please Register Your Email, or check your credentials'});
-          }
-      });
+            } else {
+                resp.status(200).json({message: 'Please Register Your Email, or check your credentials'});
+            }
+        });
 
 
-  }else{
-      resp.status(200).json({message:'Failed!'});
-  }
+    } else {
+        resp.status(200).json({message: 'Failed!'});
+    }
 
 };
 
+const verifyToken = (req, resp) => {
+    try {
+
+        const token = req.headers.token ? req.headers.token : 'empty';
+        if (token === 'empty') {
+            resp.status(401).json({message: 'UnAuthorized Request Detected!'});
+            return;
+        }
+
+        const isValid = new Promise((resolve, reject) => {
+            jwt.verify(token, process.env.JWT_ACCOUNT, function (error, decoded) {
+               if (error){
+                   reject(false);
+               }
+               if (decoded){
+                   resolve(true);
+               }
+            })
+        });
+
+        isValid.then(r=>{
+            resp.status(200).json({state:true, message:'success'});
+        }).catch(er=>{
+            resp.status(200).json({state:true, message:' UnAuthorized Request Detected!'});
+        })
+
+
+
+    } catch (e) {
+        resp.status(500).json({message: e});
+    }
+};
+
+
 module.exports = {
-    registerUser, loginUser
+    registerUser, loginUser, verifyToken
 }

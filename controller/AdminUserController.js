@@ -3,6 +3,8 @@ const bcrypt = require('bcrypt');
 
 const registerUser=(req,resp)=>{
 
+    console.log(req.body);
+
     AdminUserSchema.findOne({email:req.body.email}, (error,result)=>{
 
         if (error){
